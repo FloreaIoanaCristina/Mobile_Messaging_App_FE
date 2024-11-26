@@ -56,7 +56,7 @@ class _ChatPageState extends State<ChatPage> {
                     decoration: BoxDecoration(
                       color: index % 2 == 0
                           ? Colors.grey[300]
-                          : Colors.blue[200],
+                          : Colors.blue,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(

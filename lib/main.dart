@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:messaging_mobile_app/conversation_page.dart';
 import 'log_in_page.dart';
+import 'sign_up_page.dart';
 
 void main() {
   runApp(MessagingApp());

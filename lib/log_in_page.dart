@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:messaging_mobile_app/sign_up_page.dart';
 
 import 'conversation_page.dart';
 
@@ -39,10 +40,10 @@ class _LogInPageState extends State<LogInPage> {
           SizedBox(height:20),
           TextField(enabled: true,),
           SizedBox(height:20),
-          TextButton(onPressed: null,
+          TextButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder:(context) => new ChatPage())),
               child:Text('Log In')),
           SizedBox(height:20),
-          TextButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder:(context) => new ChatPage())),
+          TextButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder:(context) => new SignUpPage())),
               child:Text('Not a member? Sign Up'))
         ],
       )

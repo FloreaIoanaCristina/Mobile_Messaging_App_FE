@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:messaging_mobile_app/style/colors.dart';
-
 import 'conversation_page.dart';
 
 class MessagingApp extends StatelessWidget {

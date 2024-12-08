@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:messaging_mobile_app/log_in_page.dart';
 
 
-class  SignUpPage extends StatefulWidget {
+class SignUpPage extends StatefulWidget {
   @override
   _SignUpPageState createState() => _SignUpPageState();
 }

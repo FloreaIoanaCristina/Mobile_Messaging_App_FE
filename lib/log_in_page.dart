@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:messaging_mobile_app/style/colors.dart';
 
 import 'conversation_page.dart';
 
@@ -10,7 +11,12 @@ class MessagingApp extends StatelessWidget {
       title: 'Messaging App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-      ),
+          textTheme: const  TextTheme(
+            headlineLarge: TextStyle(fontFamily: 'Inter', fontSize: 40, fontWeight: FontWeight.bold, color: AppColors.textColor),
+            bodyMedium: TextStyle(fontFamily: 'Inter',fontSize: 16, fontWeight: FontWeight.normal),
+          ),
+
+    ),
       home: LogInPage(),
     );
   }
@@ -28,13 +34,15 @@ class _LogInPageState extends State<LogInPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Hello'),
-        centerTitle: true,
-        titleTextStyle: TextStyle( color: Colors.teal, fontSize: 20)
-        ),
+      backgroundColor: AppColors.backgroundColor,
       body: Column(
         children: [
+          SizedBox(height:20),
+          Row(
+            children: [
+              Text("Welcome back!",style: Theme.of(context).textTheme. headlineLarge,),
+              SizedBox(width:20),
+            ],),
           TextField(enabled: true,),
           SizedBox(height:20),
           TextField(enabled: true,),

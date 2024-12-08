@@ -40,7 +40,7 @@ class _LogInPageState extends State<LogInPage> {
           SizedBox(height:20),
           Row(
             children: [
-              Text("Welcome back!",style: Theme.of(context).textTheme. headlineLarge,),
+              Text("Welcome back!",style: Theme.of(context).textTheme. headlineLarge,softWrap: true,),
               SizedBox(width:20),
             ],),
           TextField(enabled: true,),

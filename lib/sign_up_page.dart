@@ -1,25 +1,10 @@
-
-
-import 'conversation_page.dart';
 import 'package:flutter/material.dart';
+import 'package:messaging_mobile_app/log_in_page.dart';
 
-class MessagingApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Messaging App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: SignUpPage(),
-    );
-  }
-}
 
 class  SignUpPage extends StatefulWidget {
   @override
-  _SignUp createState() => _SignUpPageState();
+  _SignUpPageState createState() => _SignUpPageState();
 }
 
 class _SignUpPageState extends State<SignUpPage> {
@@ -44,7 +29,7 @@ class _SignUpPageState extends State<SignUpPage> {
             SizedBox(height: 20),
             TextButton(onPressed: () =>
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => new log_in_page())),
+                    MaterialPageRoute(builder: (context) => new LogInPage())),
                 child: Text('Create a new account '))
           ],
         )

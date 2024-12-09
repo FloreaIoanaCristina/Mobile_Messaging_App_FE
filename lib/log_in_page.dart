@@ -35,25 +35,84 @@ class _LogInPageState extends State<LogInPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      body: Column(
-        children: [
-          SizedBox(height:20),
-          Row(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Welcome back!",style: Theme.of(context).textTheme. headlineLarge,softWrap: true,),
-              SizedBox(width:20),
-            ],),
-          TextField(enabled: true,),
-          SizedBox(height:20),
-          TextField(enabled: true,),
-          SizedBox(height:20),
-          TextButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder:(context) => new ChatPage())),
-              child:Text('Log In')),
-          SizedBox(height:20),
-          TextButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder:(context) => new SignUpPage())),
-              child:Text('Not a member? Sign Up'))
-        ],
-      )
-      );
+              const SizedBox(height: 50),
+              const Text(
+                "Welcome\nBack!",
+                style: TextStyle(
+                  color: AppColors.textColor,
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 40),
+              // Username/Email Field
+              const TextField(
+                  style: TextStyle(color: AppColors.textColor),
+                  decoration: InputDecoration(
+                hintText: "Username or Email",
+                prefixIcon: Icon(Icons.person)
+              )),
+              const SizedBox(height: 20),
+              // Password Field
+              const TextField(
+                style: TextStyle(color: AppColors.textColor),
+                decoration: InputDecoration(
+                hintText: "Password",
+                prefixIcon: Icon(Icons.lock),
+              ),
+                obscureText: true,
+              ),
+              const SizedBox(height: 10),
+              // Forgot Password
+              const Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  "Forgot Password?",
+                  style: TextStyle(
+                    color: AppColors.accentColor,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              // Sign In Row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                   TextButton(
+                     onPressed:() => Navigator.push(context, MaterialPageRoute(builder:(context) => new SignUpPage())),
+                   child: Text("Sign In",
+                      style: TextStyle(
+                        color: AppColors.textColor,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),)
+
+                  ),
+                  CircleAvatar(
+                    backgroundColor: AppColors.accentColor,
+                    radius: 25,
+                    child: IconButton(
+                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder:(context) => new ChatPage())),
+                      icon: const Icon(
+                        Icons.arrow_forward,
+                        color:  AppColors.textColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 30),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

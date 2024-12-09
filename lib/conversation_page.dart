@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:messaging_mobile_app/style/colors.dart';
 
 class ConversationPage extends StatelessWidget {
   @override
@@ -35,6 +36,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         title: Text('Messaging App'),
         centerTitle: true,
@@ -74,6 +76,7 @@ class _ChatPageState extends State<ChatPage> {
               children: [
                 Expanded(
                   child: TextField(
+                    style: TextStyle(color: AppColors.textColor),
                     controller: _controller,
                     decoration: InputDecoration(
                       hintText: 'Type a message...',

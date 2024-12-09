@@ -1,0 +1,27 @@
+[
+    {
+        "id": "1",
+        "name": "John Doe",
+        "last_message": "Hey, can we meet tomorrow?"
+    },
+    {
+        "id": "2",
+        "name": "Jane Smith",
+        "last_message": "Sure, let me check my schedule."
+    },
+    {
+        "id": "3",
+        "name": "Bob Johnson",
+        "last_message": "Thanks for the update!"
+    },
+    {
+        "id": "4",
+        "name": "Alice Brown",
+        "last_message": "Looking forward to the event next week."
+    },
+    {
+        "id": "5",
+        "name": "Charlie Davis",
+        "last_message": "I'll call you later."
+    }
+]

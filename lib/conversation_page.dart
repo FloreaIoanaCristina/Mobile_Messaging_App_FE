@@ -1,26 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:messaging_mobile_app/style/colors.dart';
 
-class ConversationPage extends StatelessWidget {
+class ConversationPage extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Messaging App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: ChatPage(),
-    );
-  }
+  _ConversationPageState createState() => _ConversationPageState();
 }
 
-class ChatPage extends StatefulWidget {
-  @override
-  _ChatPageState createState() => _ChatPageState();
-}
-
-class _ChatPageState extends State<ChatPage> {
+class _ConversationPageState extends State<ConversationPage> {
   final TextEditingController _controller = TextEditingController();
   final List<String> _messages = [];
 

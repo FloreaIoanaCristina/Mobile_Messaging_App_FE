@@ -1,26 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:messaging_mobile_app/contacts_page.dart';
+import 'package:messaging_mobile_app/forgot_password.dart';
 import 'package:messaging_mobile_app/sign_up_page.dart';
 import 'package:messaging_mobile_app/style/colors.dart';
 import 'conversation_page.dart';
-
-class MessagingApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Messaging App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-          textTheme: const  TextTheme(
-            headlineLarge: TextStyle(fontFamily: 'Inter', fontSize: 40, fontWeight: FontWeight.bold, color: AppColors.textColor),
-            bodyMedium: TextStyle(fontFamily: 'Inter',fontSize: 16, fontWeight: FontWeight.normal),
-          ),
-
-    ),
-      home: LogInPage(),
-    );
-  }
-}
 
 class  LogInPage extends StatefulWidget {
   @override
@@ -28,8 +11,6 @@ class  LogInPage extends StatefulWidget {
 }
 
 class _LogInPageState extends State<LogInPage> {
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -70,15 +51,18 @@ class _LogInPageState extends State<LogInPage> {
               ),
               const SizedBox(height: 10),
               // Forgot Password
-              const Align(
+              Align(
                 alignment: Alignment.centerRight,
-                child: Text(
+                child: TextButton(onPressed: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => new ForgotPasswordPage())), child: const Text(
                   "Forgot Password?",
                   style: TextStyle(
                     color: AppColors.accentColor,
                     fontSize: 14,
                   ),
                 ),
+                ),
+
               ),
               const Spacer(),
               // Sign In Row
@@ -99,7 +83,7 @@ class _LogInPageState extends State<LogInPage> {
                     backgroundColor: AppColors.accentColor,
                     radius: 25,
                     child: IconButton(
-                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder:(context) => new ChatPage())),
+                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder:(context) => new ContactsPage())),
                       icon: const Icon(
                         Icons.arrow_forward,
                         color:  AppColors.textColor,

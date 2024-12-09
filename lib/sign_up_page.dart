@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:messaging_mobile_app/log_in_page.dart';
+import 'package:messaging_mobile_app/profile_picture_page.dart';
 import 'package:messaging_mobile_app/style/colors.dart';
 
 
@@ -34,7 +35,11 @@ class _SignUpPageState extends State<SignUpPage> {
             TextButton(onPressed: () =>
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => new LogInPage())),
-                child: Text('Create a new account '))
+                child: Text('Create a new account ')),
+            TextButton(onPressed: () =>
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => new ProfilePicturePage())),
+                child: Text('Sign Up '))
           ],
         )
     );

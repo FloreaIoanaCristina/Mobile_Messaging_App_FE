@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:messaging_mobile_app/change_password_page.dart';
 import 'package:messaging_mobile_app/style/colors.dart';
-import 'log_in_page.dart';
+import 'package:messaging_mobile_app/log_in_page.dart';
 
 class VerificationCodePage extends StatefulWidget {
   @override

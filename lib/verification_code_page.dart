@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:messaging_mobile_app/change_password_page.dart';
 import 'package:messaging_mobile_app/style/colors.dart';
-import 'package:messaging_mobile_app/log_in_page.dart';
 
 class VerificationCodePage extends StatefulWidget {
   @override
@@ -12,79 +11,86 @@ class _VerificationCodePageState extends State<VerificationCodePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.backgroundColor,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              const SizedBox(height: 50),
               Text(
                 'Verification',
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.textColor,
-                  fontSize: 24,
+                  fontSize: 40, // Dimensiune mai mare pentru titlu
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text(
-                'Enter the code from the email we just sent you',
-                style: TextStyle(
+                'Enter the code\nfrom the SMS we just sent you', // Text pe 2 rânduri
+                style: const TextStyle(
                   color: AppColors.textColor,
-                  fontSize: 16,
+                  fontSize: 16, // Dimensiune mai mică pentru subtitlu
+                  height: 1.5,
                 ),
-                textAlign: TextAlign.center,
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 50),
               TextField(
+                textAlign: TextAlign.center,
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: AppColors.primaryColor,
+                  fillColor: AppColors.secondaryColor, // Fundal gri mai închis
                   hintText: 'Enter the code provided',
-                  hintStyle: TextStyle(color: Colors.grey[400]),
-                  prefixIcon: Icon(Icons.email, color: Colors.grey[400]),
+                  hintStyle: TextStyle(color: AppColors.primaryColor),
+                  prefixIcon: Icon(Icons.email, color: AppColors.primaryColor),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+                    borderRadius: BorderRadius.circular(10.0), // Rotunjire mai mare
                     borderSide: BorderSide.none,
                   ),
                 ),
-                style: TextStyle(color: AppColors.textColor),
+                style: const TextStyle(color: AppColors.textColor),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 5),
               TextButton(
                 onPressed: () {
-                  // Action for resending code
+                  // Acțiunea pentru trimiterea codului din nou
                 },
-                child: Text(
+                child: const Text(
                   'Send code again',
                   style: TextStyle(
                     color: AppColors.textColor,
+                    fontSize: 16,
                     decoration: TextDecoration.underline,
                   ),
                 ),
               ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ChangePasswordPage()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.accentColor,
-                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+              const SizedBox(height: 20),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ChangePasswordPage()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.accentColor,
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 110, vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0), // Rotunjire buton
+                    ),
                   ),
-                ),
-                child: Text(
-                  'Submit',
-                  style: TextStyle(
-                    color: AppColors.textColor,
-                    fontSize: 16,
+                  child: const Text(
+                    'Submit',
+                    style: TextStyle(
+                      color: AppColors.textColor, // Text alb pe fundal portocaliu
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),

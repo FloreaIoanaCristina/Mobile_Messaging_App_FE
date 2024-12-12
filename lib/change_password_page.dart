@@ -5,68 +5,74 @@ class ChangePasswordPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: Center(
+      backgroundColor: AppColors.backgroundColor, // Folosim culoarea din AppColors
+      body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0), // Padding uniform pe orizontală
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start, // Aliniere la stânga
             children: [
-              Text(
-                'Create a new password',
+              const SizedBox(height: 50), // Spațiu de sus
+              const Text(
+                'Create a new password', // Textul rămâne neschimbat
                 style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+                  color: AppColors.textColor, // Culoare text din AppColors
+                  fontSize: 40,
+                  fontWeight: FontWeight.w800,
+                  fontFamily: 'Inter',
                 ),
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30), // Spațiu între text și câmpurile de input
               TextField(
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: Colors.grey[800],
+                  fillColor: AppColors.secondaryColor,
                   hintText: 'Password',
-                  hintStyle: TextStyle(color: Colors.grey[400]),
-                  prefixIcon: Icon(Icons.lock, color: Colors.grey[400]),
+                  hintStyle: TextStyle(color: AppColors.primaryColor),
+                  prefixIcon: Icon(Icons.lock, color: AppColors.primaryColor),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+                    borderRadius: BorderRadius.circular(20.0),
                     borderSide: BorderSide.none,
                   ),
                 ),
                 obscureText: true,
-                style: TextStyle(color: Colors.white),
+                style: const TextStyle(color: AppColors.textColor),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 30), // Spațiu între câmpurile de input
               TextField(
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: Colors.grey[800],
+                  fillColor: AppColors.secondaryColor,
                   hintText: 'Confirm Password',
-                  hintStyle: TextStyle(color: Colors.grey[400]),
-                  prefixIcon: Icon(Icons.lock, color: Colors.grey[400]),
+                  hintStyle: TextStyle(color: AppColors.primaryColor),
+                  prefixIcon: Icon(Icons.lock, color: AppColors.primaryColor),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+                    borderRadius: BorderRadius.circular(20.0),
                     borderSide: BorderSide.none,
                   ),
                 ),
                 obscureText: true,
-                style: TextStyle(color: Colors.white),
+                style: const TextStyle(color: AppColors.textColor),
               ),
-              SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: () {
-                  // Action for submitting the new password
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.accentColor,
-                  shape: CircleBorder(),
-                  padding: EdgeInsets.all(20),
-                ),
-                child: Icon(
-                  Icons.arrow_forward,
-                  color: Colors.white,
-                ),
+              const SizedBox(height: 30), // Spațiu înainte de buton
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      // Acțiunea butonului
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.accentColor,
+                      shape: const CircleBorder(),
+                      padding: const EdgeInsets.all(20),
+                    ),
+                    child: const Icon(
+                      Icons.arrow_forward,
+                      color: AppColors.textColor,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

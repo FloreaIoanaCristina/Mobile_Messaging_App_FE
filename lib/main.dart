@@ -18,7 +18,7 @@ class MessagingApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         textTheme: const  TextTheme(
           headlineLarge: TextStyle(fontFamily: 'Inter', fontSize: 40, fontWeight: FontWeight.bold, color: AppColors.textColor),
-          bodyMedium: TextStyle(fontFamily: 'Inter',fontSize: 16, fontWeight: FontWeight.normal),
+          bodyMedium: TextStyle(fontFamily: 'Inter',fontSize: 16, fontWeight: FontWeight.normal,color: AppColors.textColor),
         ),
 
       ),

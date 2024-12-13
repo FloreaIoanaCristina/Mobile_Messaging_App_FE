@@ -7,4 +7,5 @@ class AppColors {
   static const Color backgroundColor = Color(0xFF1D1D1D);
   static const Color textColor = Color(0xFFFFFFFF);
   static const Color errorColor = Color(0xFFB00020);
+  static const Color backgroundContactsColor = Color(0xFF2C2C2C);
 }

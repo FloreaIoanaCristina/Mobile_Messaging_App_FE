@@ -3,13 +3,35 @@ import 'package:messaging_mobile_app/log_in_page.dart';
 import 'package:messaging_mobile_app/profile_picture_page.dart';
 import 'package:messaging_mobile_app/style/colors.dart';
 
-
 class SignUpPage extends StatefulWidget {
   @override
   _SignUpPageState createState() => _SignUpPageState();
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  final _usernameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  bool _isUsernameValid = true;
+  bool _isPhoneValid = true;
+  bool _isPasswordValid = true;
+
+  void _validateAndNavigate() {
+    setState(() {
+      _isUsernameValid = _usernameController.text.isNotEmpty;
+      _isPhoneValid = _phoneController.text.isNotEmpty;
+      _isPasswordValid = _passwordController.text.isNotEmpty;
+    });
+
+    if (_isUsernameValid && _isPhoneValid && _isPasswordValid) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ProfilePage()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,6 +54,7 @@ class _SignUpPageState extends State<SignUpPage> {
               const SizedBox(height: 40),
               // Username Field
               TextField(
+                controller: _usernameController,
                 style: const TextStyle(color: AppColors.textColor),
                 decoration: InputDecoration(
                   filled: true,
@@ -46,9 +69,21 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 ),
               ),
+              if (!_isUsernameValid)
+                Padding(
+                  padding: const EdgeInsets.only(top: 5.0),
+                  child: Text(
+                    "This field is required",
+                    style: TextStyle(
+                      color: AppColors.errorColor,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
               const SizedBox(height: 34),
               // Phone Number Field
               TextField(
+                controller: _phoneController,
                 style: const TextStyle(color: AppColors.textColor),
                 decoration: InputDecoration(
                   filled: true,
@@ -62,9 +97,21 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 ),
               ),
+              if (!_isPhoneValid)
+                Padding(
+                  padding: const EdgeInsets.only(top: 5.0),
+                  child: Text(
+                    "This field is required",
+                    style: TextStyle(
+                      color: AppColors.errorColor,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
               const SizedBox(height: 34),
               // Password Field
               TextField(
+                controller: _passwordController,
                 obscureText: true,
                 style: const TextStyle(color: AppColors.textColor),
                 decoration: InputDecoration(
@@ -79,6 +126,17 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 ),
               ),
+              if (!_isPasswordValid)
+                Padding(
+                  padding: const EdgeInsets.only(top: 5.0),
+                  child: Text(
+                    "This field is required",
+                    style: TextStyle(
+                      color: AppColors.errorColor,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
               const SizedBox(height: 20),
               // Terms & Conditions Text
               Align(
@@ -112,10 +170,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     backgroundColor: AppColors.accentColor,
                     radius: 25,
                     child: IconButton(
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => LogInPage()),
-                      ),
+                      onPressed: _validateAndNavigate,
                       icon: const Icon(
                         Icons.arrow_forward,
                         color: AppColors.textColor,

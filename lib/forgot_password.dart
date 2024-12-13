@@ -8,6 +8,22 @@ class ForgotPasswordPage extends StatefulWidget {
 }
 
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
+  final _phoneNumberController = TextEditingController();
+  bool _isPhoneNumberValid = true;
+
+  void _validateAndNavigate() {
+    setState(() {
+      _isPhoneNumberValid = _phoneNumberController.text.isNotEmpty;
+    });
+
+    if (_isPhoneNumberValid) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => VerificationCodePage()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,14 +35,15 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 50),
-               Text(
+              Text(
                 "Forgot\nPassword?",
-                   style: Theme.of(context).textTheme.headlineLarge
+                style: Theme.of(context).textTheme.headlineLarge,
               ),
               const SizedBox(height: 40),
 
               // Phone Number Field
               TextField(
+                controller: _phoneNumberController,
                 style: const TextStyle(color: AppColors.textColor),
                 decoration: InputDecoration(
                   filled: true,
@@ -40,6 +57,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   ),
                 ),
               ),
+              if (!_isPhoneNumberValid)
+                Padding(
+                  padding: const EdgeInsets.only(top: 5.0),
+                  child: Text(
+                    "This field is required",
+                    style: TextStyle(
+                      color: AppColors.errorColor,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
               const SizedBox(height: 20),
 
               // Terms & Conditions Text
@@ -56,20 +84,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-
-                     Text(
-                      "Send Code",
-                      style: Theme.of(context).textTheme.bodyMedium
-                    ),
+                  Text(
+                    "Send Code",
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
 
                   CircleAvatar(
                     backgroundColor: AppColors.accentColor,
                     radius: 25,
                     child: IconButton(
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => VerificationCodePage()),
-                      ),
+                      onPressed: _validateAndNavigate,
                       icon: const Icon(
                         Icons.arrow_forward,
                         color: AppColors.textColor,

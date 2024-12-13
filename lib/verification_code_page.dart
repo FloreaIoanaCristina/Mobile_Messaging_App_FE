@@ -8,6 +8,22 @@ class VerificationCodePage extends StatefulWidget {
 }
 
 class _VerificationCodePageState extends State<VerificationCodePage> {
+  final _codeController = TextEditingController();
+  bool _isCodeValid = true;
+
+  void _validateAndNavigate() {
+    setState(() {
+      _isCodeValid = _codeController.text.isNotEmpty;
+    });
+
+    if (_isCodeValid) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ChangePasswordPage()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,6 +59,7 @@ class _VerificationCodePageState extends State<VerificationCodePage> {
               ),
               const SizedBox(height: 50),
               TextField(
+                controller: _codeController,
                 textAlign: TextAlign.center,
                 decoration: InputDecoration(
                   filled: true,
@@ -57,6 +74,17 @@ class _VerificationCodePageState extends State<VerificationCodePage> {
                 ),
                 style: const TextStyle(color: AppColors.textColor),
               ),
+              if (!_isCodeValid)
+                Padding(
+                  padding: const EdgeInsets.only(top: 5.0),
+                  child: Text(
+                    "This field is required",
+                    style: TextStyle(
+                      color: AppColors.errorColor,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
               const SizedBox(height: 5),
               TextButton(
                 onPressed: () {
@@ -77,13 +105,7 @@ class _VerificationCodePageState extends State<VerificationCodePage> {
               const SizedBox(height: 20),
               Center(
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ChangePasswordPage()),
-                    );
-                  },
+                  onPressed: _validateAndNavigate,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.accentColor,
                     padding:

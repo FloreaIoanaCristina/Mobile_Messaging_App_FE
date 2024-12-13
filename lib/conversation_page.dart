@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:messaging_mobile_app/style/colors.dart';
+import 'contacts_page.dart';
 
 class ConversationPage extends StatefulWidget {
   @override
   _ConversationPageState createState() => _ConversationPageState();
+  final String conversationName;
+  final String lastMessage;
+  const ConversationPage({
+    required this.conversationName,
+    required this.lastMessage,
+  });
 }
 
 class _ConversationPageState extends State<ConversationPage> {
   final TextEditingController _controller = TextEditingController();
   final List<String> _messages = [];
   final ScrollController _scrollController = ScrollController();
+
 
   void _sendMessage() {
     if (_controller.text.trim().isNotEmpty) {
@@ -34,7 +42,9 @@ class _ConversationPageState extends State<ConversationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      body: Column(
+        body: Padding(
+        padding: const EdgeInsets.all(20.0),
+      child: Column(
         children: [
           // Top Bar with Profile Picture and User Info
           Container(
@@ -51,6 +61,7 @@ class _ConversationPageState extends State<ConversationPage> {
                   icon: const Icon(Icons.arrow_back, color: AppColors.accentColor),
                   onPressed: () {
                     Navigator.pop(context);
+                    // Funcționalitate pentru căutare
                   },
                 ),
                 CircleAvatar(
@@ -60,9 +71,9 @@ class _ConversationPageState extends State<ConversationPage> {
                 const SizedBox(width: 10),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
-                      'User',
+                      widget.conversationName,
                       style: TextStyle(
                         color: AppColors.textColor,
                         fontWeight: FontWeight.bold,
@@ -148,6 +159,7 @@ class _ConversationPageState extends State<ConversationPage> {
           ),
         ],
       ),
+    )
     );
   }
 }

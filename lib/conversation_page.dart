@@ -2,6 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:messaging_mobile_app/style/colors.dart';
 
 class ConversationPage extends StatefulWidget {
+  final String conversationName;
+  final String lastMessage;
+
+  const ConversationPage({
+    required this.conversationName,
+    required this.lastMessage,
+  });
+
   @override
   _ConversationPageState createState() => _ConversationPageState();
 }
@@ -22,10 +30,74 @@ class _ConversationPageState extends State<ConversationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      appBar: AppBar(
-        title: Text('Messaging App'),
-        centerTitle: true,
+      backgroundColor: AppColors.backgroundContactsColor, // Fundal întunecat
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(80),
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppColors.backgroundColor,
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(20),
+              bottomRight: Radius.circular(20),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.accentColor,
+                      shape: BoxShape.circle,
+                    ),
+                    padding: EdgeInsets.all(8),
+                    child: Icon(Icons.arrow_back, color: AppColors.textColor),
+                  ),
+                ),
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 24,
+                      backgroundImage: NetworkImage(
+                          'https://via.placeholder.com/150'), // Imagine profil
+                    ),
+                    SizedBox(width: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          widget.conversationName,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textColor,
+                          ),
+                        ),
+                        Text(
+                          'online',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                IconButton(
+                  icon: Icon(Icons.more_vert, color: AppColors.accentColor),
+                  onPressed: () {
+                    // Acțiune pentru cele 3 puncte
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: Column(
         children: [
@@ -34,22 +106,28 @@ class _ConversationPageState extends State<ConversationPage> {
               reverse: true,
               itemCount: _messages.length,
               itemBuilder: (context, index) {
+                bool isUserMessage = index % 2 == 0;
                 return Align(
-                  alignment: index % 2 == 0
+                  alignment: isUserMessage
                       ? Alignment.centerLeft
                       : Alignment.centerRight,
                   child: Container(
                     margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                    padding: EdgeInsets.all(10),
+                    padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: index % 2 == 0
-                          ? Colors.grey
-                          : Colors.blue[200],
-                      borderRadius: BorderRadius.circular(8),
+                      color: isUserMessage
+                          ? AppColors.primaryColor
+                          : AppColors.primaryColor,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(isUserMessage ? 0 : 12),
+                        topRight: Radius.circular(isUserMessage ? 12 : 0),
+                        bottomLeft: Radius.circular(12),
+                        bottomRight: Radius.circular(12),
+                      ),
                     ),
                     child: Text(
                       _messages[_messages.length - 1 - index],
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(color: AppColors.textColor, fontSize: 16),
                     ),
                   ),
                 );
@@ -65,20 +143,27 @@ class _ConversationPageState extends State<ConversationPage> {
                     style: TextStyle(color: AppColors.textColor),
                     controller: _controller,
                     decoration: InputDecoration(
+                      filled: true,
+                      fillColor: AppColors.primaryColor,
                       hintText: 'Type a message...',
+                      hintStyle: TextStyle(color: AppColors.primaryColor),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
                       ),
                     ),
                   ),
                 ),
                 SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: _sendMessage,
-                  child: Icon(Icons.send),
-                  style: ElevatedButton.styleFrom(
-                    shape: CircleBorder(),
+                GestureDetector(
+                  onTap: _sendMessage,
+                  child: Container(
                     padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.backgroundContactsColor,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.send, color: AppColors.accentColor),
                   ),
                 ),
               ],

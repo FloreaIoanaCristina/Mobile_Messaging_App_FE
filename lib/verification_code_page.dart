@@ -25,7 +25,9 @@ class _VerificationCodePageState extends State<VerificationCodePage> {
                 style: const TextStyle(
                   color: AppColors.textColor,
                   fontSize: 40, // Dimensiune mai mare pentru titlu
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w800,
+                  fontFamily: 'Inter',
+                  height: 0,
                 ),
               ),
               const SizedBox(height: 10),
@@ -34,6 +36,8 @@ class _VerificationCodePageState extends State<VerificationCodePage> {
                 style: const TextStyle(
                   color: AppColors.textColor,
                   fontSize: 16, // Dimensiune mai mică pentru subtitlu
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w800,
                   height: 1.5,
                 ),
               ),
@@ -63,6 +67,9 @@ class _VerificationCodePageState extends State<VerificationCodePage> {
                   style: TextStyle(
                     color: AppColors.textColor,
                     fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    fontFamily: 'Inter',
+                    height: 0,
                     decoration: TextDecoration.underline,
                   ),
                 ),

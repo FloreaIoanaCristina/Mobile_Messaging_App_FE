@@ -38,7 +38,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 child: Text('Create a new account ')),
             TextButton(onPressed: () =>
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => new ProfilePicturePage())),
+                    MaterialPageRoute(builder: (context) => new ProfilePage())),
                 child: Text('Sign Up '))
           ],
         )

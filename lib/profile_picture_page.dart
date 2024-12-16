@@ -4,6 +4,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:messaging_mobile_app/contacts_page.dart';
 import 'package:messaging_mobile_app/style/colors.dart';
 
+import 'log_in_page.dart';
+
 class ProfilePage extends StatefulWidget {
   @override
   _ProfilePageState createState() => _ProfilePageState();
@@ -91,7 +93,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => ContactsPage()),
+                        builder: (context) => LogInPage()),
                   );
                 },
                 style: ElevatedButton.styleFrom(

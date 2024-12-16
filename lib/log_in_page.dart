@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:messaging_mobile_app/repos/accounts_repo.dart';
+import 'package:provider/provider.dart';
 import 'package:messaging_mobile_app/contacts_page.dart';
 import 'package:messaging_mobile_app/forgot_password.dart';
 import 'package:messaging_mobile_app/sign_up_page.dart';
@@ -12,30 +14,61 @@ class LogInPage extends StatefulWidget {
 class _LogInPageState extends State<LogInPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+
   bool _isUsernameValid = true;
   bool _isPasswordValid = true;
+  bool _isLoading = false;
+  String? _errorMessage;
 
-  void _validateAndNavigate() {
+  void _logInUser(AuthService authService) async {
     setState(() {
       _isUsernameValid = _usernameController.text.isNotEmpty;
       _isPasswordValid = _passwordController.text.isNotEmpty;
+      _errorMessage = null;
+      _isLoading = true;
     });
 
     if (_isUsernameValid && _isPasswordValid) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ContactsPage()),
-      );
+      try {
+        final token = await authService.loginUser(
+          _usernameController.text,
+          _passwordController.text,
+        );
+
+        if (token != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ContactsPage()),
+          );
+        }
+      } catch (e) {
+        setState(() {
+          _errorMessage = "Login failed: ${e.toString()}";
+        });
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } else {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Access the globally provided AuthService instance
+    final authService = Provider.of<AuthService>(context, listen: false);
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: SingleChildScrollView(
+          child: Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -72,7 +105,7 @@ class _LogInPageState extends State<LogInPage> {
                     "This field is required",
                     style: TextStyle(
                       color: AppColors.errorColor,
-                      fontSize: 12, // Text mai mare
+                      fontSize: 12,
                     ),
                   ),
                 ),
@@ -86,8 +119,7 @@ class _LogInPageState extends State<LogInPage> {
                   fillColor: AppColors.backgroundContactsColor,
                   hintText: "Password",
                   hintStyle: const TextStyle(color: AppColors.primaryColor),
-
-                  prefixIcon: Icon(Icons.lock, color: AppColors.primaryColor,),
+                  prefixIcon: Icon(Icons.lock, color: AppColors.primaryColor),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -102,12 +134,17 @@ class _LogInPageState extends State<LogInPage> {
                     "This field is required",
                     style: TextStyle(
                       color: AppColors.errorColor,
-                      fontSize: 12, // Text mai mare
+                      fontSize: 12,
                     ),
                   ),
                 ),
               const SizedBox(height: 10),
               // Forgot Password
+              if (_errorMessage != null)
+                Text(
+                  _errorMessage!,
+                  style: TextStyle(color: AppColors.errorColor),
+                ),
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
@@ -124,7 +161,7 @@ class _LogInPageState extends State<LogInPage> {
                   ),
                 ),
               ),
-              const Spacer(),
+              const SizedBox(height: 20),
               // Sign In Row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -146,8 +183,12 @@ class _LogInPageState extends State<LogInPage> {
                   CircleAvatar(
                     backgroundColor: AppColors.accentColor,
                     radius: 25,
-                    child: IconButton(
-                      onPressed: _validateAndNavigate,
+                    child: _isLoading
+                        ? CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.textColor),
+                    )
+                        : IconButton(
+                      onPressed: () => _logInUser(authService),
                       icon: const Icon(
                         Icons.arrow_forward,
                         color: AppColors.textColor,
@@ -158,6 +199,8 @@ class _LogInPageState extends State<LogInPage> {
               ),
               const SizedBox(height: 30),
             ],
+          )
+          )
           ),
         ),
       ),

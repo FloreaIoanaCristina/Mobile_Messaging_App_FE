@@ -1,6 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:messaging_mobile_app/repos/accounts_repo.dart';
 import 'package:messaging_mobile_app/repos/conversations_repo.dart';
 import 'package:messaging_mobile_app/services/messaging_service.dart';
@@ -8,6 +13,9 @@ import 'package:messaging_mobile_app/style/colors.dart';
 import 'package:provider/provider.dart';
 
 import 'contacts_page.dart';
+import 'maps_page.dart';
+import 'media_display_modal.dart';
+import 'media_page.dart';
 import 'models/message.dart';
 
 class ConversationPage extends StatefulWidget {
@@ -19,8 +27,10 @@ class ConversationPage extends StatefulWidget {
 }
 
 class _ConversationPageState extends State<ConversationPage> {
+  final ImagePicker _picker = ImagePicker();
   Message? _editedMessage;
   final TextEditingController _controller = TextEditingController();
+
   //final List<dynamic> _messages = [];
   final ScrollController _scrollController = ScrollController();
   String? _conversationName;
@@ -31,13 +41,16 @@ class _ConversationPageState extends State<ConversationPage> {
   // This method is used to fetch the conversation from the backend
   Future<void> _fetchConversation() async {
     try {
-      final conversationsService = Provider.of<ConversationsService>(context, listen: false);
+      final conversationsService = Provider.of<ConversationsService>(
+          context, listen: false);
       final authService = Provider.of<AuthService>(context, listen: false);
-      final messagingService = Provider.of<MessagingService>(context, listen: false);
+      final messagingService = Provider.of<MessagingService>(
+          context, listen: false);
       String? userId = await authService.getIdFromClaims();
       if (userId != null) {
         _userId = userId;
-        final conversation = await conversationsService.getConversationById(widget.conversationId, userId);
+        final conversation = await conversationsService.getConversationById(
+            widget.conversationId, userId);
 
         setState(() {
           _conversationName = conversation['name'];
@@ -50,6 +63,10 @@ class _ConversationPageState extends State<ConversationPage> {
           _isLoading = false;
         });
       }
+      messagingService.messages.forEach((message)
+      {
+        print(message);
+      });
     } catch (e) {
       setState(() {
         _isLoading = false;
@@ -57,24 +74,27 @@ class _ConversationPageState extends State<ConversationPage> {
       print("Error fetching conversation: $e");
     }
   }
+
   @override
-  void initState(){
-    final messagingService = Provider.of<MessagingService>(context,listen: false);
+  void initState() {
+    final messagingService = Provider.of<MessagingService>(
+        context, listen: false);
     super.initState();
     messagingService.messages.clear();
     _fetchConversation();
     messagingService.startConnection();
-
   }
 
   @override
   void dispose() {
-    final messagingService = Provider.of<MessagingService>(context, listen: false);
-    messagingService.stopConnection();
+    // final messagingService = Provider.of<MessagingService>(
+    //     context, listen: false);
+    // messagingService.stopConnection();
     super.dispose();
   }
-  Future<void> _sendMessage(
-      MessagingService messagingService, AuthService authService) async {
+
+  Future<void> _sendMessage(MessagingService messagingService,
+      AuthService authService) async {
     String? userId = await authService.getIdFromClaims();
     if (userId != null) {
       final messageText = _controller.text.trim();
@@ -82,18 +102,15 @@ class _ConversationPageState extends State<ConversationPage> {
       if (messageText.isNotEmpty) {
         if (_editedMessage != null) {
           // Editing an existing message
-          Message message = Message.name(_editedMessage!.messageId, _editedMessage!.sentTime, true,  messageText,
-              userId,widget.conversationId,  null,
-              false);
           await messagingService.sendMessage(
-            text: messageText,
-            senderId: userId,
-            conversationId: widget.conversationId,
-            embeddedResourceType: null,
-            isScheduled: false,
-            messageId: _editedMessage!.messageId, // Include the message ID
-            isEdited: true,
-            sentTime: _editedMessage!.sentTime// Mark the message as edited
+              text: messageText,
+              senderId: userId,
+              conversationId: widget.conversationId,
+              isScheduled: false,
+              messageId: _editedMessage!.messageId,
+              // Include the message ID
+              isEdited: true,
+              sentTime: _editedMessage!.sentTime // Mark the message as edited
           );
 
           // Reset editing state
@@ -107,7 +124,6 @@ class _ConversationPageState extends State<ConversationPage> {
             text: messageText,
             senderId: userId,
             conversationId: widget.conversationId,
-            embeddedResourceType: null,
             isScheduled: false,
           );
 
@@ -117,7 +133,8 @@ class _ConversationPageState extends State<ConversationPage> {
         // Scroll to the bottom after sending
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (_scrollController.hasClients) {
-            _scrollController.jumpTo(_scrollController.position.minScrollExtent);
+            _scrollController.jumpTo(
+                _scrollController.position.minScrollExtent);
           }
         });
       }
@@ -125,8 +142,10 @@ class _ConversationPageState extends State<ConversationPage> {
   }
 
   Future<void> _showScheduleMessageDialog(
-      ConversationsService conversationsService, AuthService authService) async {
-    DateTime selectedDateTime = DateTime.now(); // Initialize with current date & time
+      ConversationsService conversationsService,
+      AuthService authService) async {
+    DateTime selectedDateTime = DateTime
+        .now(); // Initialize with current date & time
 
     await showModalBottomSheet(
       context: context,
@@ -139,11 +158,17 @@ class _ConversationPageState extends State<ConversationPage> {
           builder: (BuildContext context, StateSetter setState) {
             return Theme(
               data: Theme.of(context).copyWith(
-                textTheme: Theme.of(context).textTheme.apply(
+                textTheme: Theme
+                    .of(context)
+                    .textTheme
+                    .apply(
                   bodyColor: AppColors.textColor,
                   displayColor: AppColors.textColor,
                 ),
-                colorScheme: Theme.of(context).colorScheme.copyWith(
+                colorScheme: Theme
+                    .of(context)
+                    .colorScheme
+                    .copyWith(
                   primary: AppColors.accentColor, // Highlight color
                   onPrimary: AppColors.textColor, // Text on highlights
                   onSurface: AppColors.textColor, // General text color
@@ -194,11 +219,15 @@ class _ConversationPageState extends State<ConversationPage> {
                           builder: (context, child) {
                             return Theme(
                               data: Theme.of(context).copyWith(
-                                colorScheme: Theme.of(context).colorScheme.copyWith(
+                                colorScheme: Theme
+                                    .of(context)
+                                    .colorScheme
+                                    .copyWith(
                                   primary: AppColors.accentColor,
                                   onSurface: AppColors.textColor, // Text color
                                 ),
-                                textTheme: Theme.of(context)
+                                textTheme: Theme
+                                    .of(context)
                                     .textTheme
                                     .apply(bodyColor: AppColors.textColor),
                               ),
@@ -239,10 +268,11 @@ class _ConversationPageState extends State<ConversationPage> {
                           onPressed: () async {
                             Navigator.pop(context); // Close the bottom sheet
                             await _sendScheduledMessage(
-                                conversationsService, authService, selectedDateTime);
+                                conversationsService, authService,
+                                selectedDateTime);
                           },
                           child: const Text("Done",
-                              style: TextStyle(color:  AppColors.accentColor)),
+                              style: TextStyle(color: AppColors.accentColor)),
                         ),
                       ],
                     ),
@@ -255,14 +285,20 @@ class _ConversationPageState extends State<ConversationPage> {
       },
     );
   }
-  Future<void> _sendScheduledMessage(
-      ConversationsService conversationsService, AuthService authService, DateTime dateTime) async {
+
+  Future<void> _sendScheduledMessage(ConversationsService conversationsService,
+      AuthService authService, DateTime dateTime) async {
     String? userId = await authService.getIdFromClaims();
     if (userId != null) {
       final text = _controller.text.trim();
       if (text.isNotEmpty) {
         try {
-           Message message = Message(sentTime: dateTime, isEdited: false, text: text, senderId: userId, conversationId: widget.conversationId, isScheduled: true);
+          Message message = Message(sentTime: dateTime,
+              isEdited: false,
+              text: text,
+              senderId: userId,
+              conversationId: widget.conversationId,
+              isScheduled: true);
           await conversationsService.scheduleMessage(
             message: message,
             senderId: userId,
@@ -280,11 +316,149 @@ class _ConversationPageState extends State<ConversationPage> {
       }
     }
   }
+
+  void _showModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+      ),
+      builder: (BuildContext context) {
+        return MediaDisplayModal(
+          onCameraTap: () => _getPhotoFromCamera(),
+          onGalleryTap: () => _getPhotoFromGallery(),
+          onDocumentTap: () => _getDocument(context),
+          onLocationTap: () => _getLiveLocation(),
+        );
+      },
+    );
+  }
+
+  Future<void> _getLiveLocation() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        //   content: Text("Location services are disabled."),
+        // ));
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Location permission denied."),
+          ));
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Location permissions are permanently denied."),
+        ));
+        return;
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      // if (mounted) {
+      //   // Show a SnackBar safely
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(content: Text("Location updated: ${position.latitude}, ${position.longitude}")),
+      //   );
+      // }
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => MapsPage() ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Failed to get location: $e"),
+      ));
+    }
+  }
+
+  Future<void> _getPhotoFromCamera() async {
+    final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
+    if (photo != null) {
+      Navigator.pop(context);
+
+      // Read the image file as bytes
+      final file = File(photo.path);
+      final List<int> fileData = await file.readAsBytes();
+
+      // Send the image message
+      await _sendImageMessage(fileData, 'image/jpeg');
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Camera image selected: ${photo.name}"),
+      ));
+    }
+  }
+
+  Future<void> _getPhotoFromGallery() async {
+    // Pick the image from the gallery
+    final XFile? photo = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (photo != null) {
+      // Ensure widget is still mounted before accessing context
+      if (!mounted) return;
+
+      final messagingService = Provider.of<MessagingService>(
+          context, listen: false);
+      await messagingService.startConnection();
+
+      final file = File(photo.path);
+      final Uint8List fileData = await file.readAsBytes();
+
+      // Send the image message safely
+      await _sendImageMessage(fileData, 'image');
+
+      // Show a snack bar to notify the user
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Gallery image selected: ${photo.name}"),
+      ));
+    }
+  }
+
+// Send image message
+  Future<void> _sendImageMessage(List<int> fileData, String fileType) async {
+    String conversationId = widget.conversationId;
+    final authService = Provider.of<AuthService>(context, listen: false);
+   // String? userId = await authService.getIdFromClaims();// Replace with actual conversation ID
+    final messagingService = Provider.of<MessagingService>(
+        context, listen: false);
+    // Send message with the image file
+    await  messagingService.sendMessage(
+      text: "",
+      senderId: _userId,
+      conversationId: conversationId,
+      embeddedResourceType: 'image',
+      fileData: fileData,
+      fileType: fileType,
+    );
+  }
+
+
+  Future<void> _getDocument(BuildContext context) async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Document selected: ${result.files.single.name}"),
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context, listen: false);
     final messagingService = Provider.of<MessagingService>(context);
-    final conversationsService = Provider.of<ConversationsService>(context, listen: false);
+    final conversationsService = Provider.of<ConversationsService>(
+        context, listen: false);
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
@@ -303,17 +477,20 @@ class _ConversationPageState extends State<ConversationPage> {
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back, color: AppColors.accentColor),
+                    icon: const Icon(
+                        Icons.arrow_back, color: AppColors.accentColor),
                     onPressed: () {
-    Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (context) => ContactsPage()), // Navigate back to ContactsPage
-    );
-
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) =>
+                            ContactsPage()), // Navigate back to ContactsPage
+                      );
                     },
                   ),
                   CircleAvatar(
-                    backgroundImage: AssetImage(_profilePicture ?? 'lib/style/Genericusericon.jpg'), // Use the fetched or default image
+                    backgroundImage: AssetImage(
+                        _profilePicture ?? 'lib/style/Genericusericon.jpg'),
+                    // Use the fetched or default image
                     radius: 20,
                   ),
                   const SizedBox(width: 10),
@@ -331,7 +508,12 @@ class _ConversationPageState extends State<ConversationPage> {
                     ],
                   ),
                   const Spacer(),
-                  const Icon(Icons.more_vert, color: AppColors.accentColor),
+                  IconButton(
+                      icon: const Icon(Icons.more_vert, color: AppColors.accentColor),
+                       onPressed: () =>
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => MediaPage(contactName: _conversationName??"", mediaFiles: [],)))
+
+                    )
                 ],
               ),
             ),
@@ -342,61 +524,78 @@ class _ConversationPageState extends State<ConversationPage> {
                 child: _isLoading
                     ? Center(child: CircularProgressIndicator())
                     : Consumer<MessagingService>(
-    builder: (context, service, _) {
-    return ListView.builder(
-                  controller: _scrollController,
-                  reverse: true,
-                  itemCount: service.messages.length,
-      itemBuilder: (context, index) {
-        final message = service.messages[index];
-        final isSender = message.senderId == _userId;
+                  builder: (context, service, _) {
+                    return ListView.builder(
+                      controller: _scrollController,
+                      reverse: true,
+                      itemCount: service.messages.length,
+                      itemBuilder: (context, index) {
+                        final message = service.messages[index];
+                        final isSender = message.senderId == _userId;
 
-        return GestureDetector(
-          onLongPress: () {
-            // Set the message to edit
-            setState(() {
-              _editedMessage = message;
-              _controller.text = message.text; // Pre-fill the input field
-            });
-          },
-          child: Align(
-            alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
-            child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: isSender
-                    ? AppColors.primaryColor
-                    : AppColors.secondaryColor, // Change color for sender/receiver
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    message.text,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: AppColors.textColor,
-                    ),
-                  ),
-                  if (message.isEdited) // Display "Edited" tag
-                    const Text(
-                      "Edited",
-                      style: TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-                );
-              }
+                        return GestureDetector(
+                          onLongPress: () {
+                            // Set the message to edit
+                            setState(() {
+                              _editedMessage = message;
+                              _controller.text = message.text; // Pre-fill the input field
+                            });
+                          },
+                          child: Align(
+                            alignment: isSender
+                                ? Alignment.centerRight
+                                : Alignment.centerLeft,
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 10),
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: isSender
+                                    ? AppColors.primaryColor
+                                    : AppColors.secondaryColor,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Check if the message has an embedded image
+                                  if (message.embeddedResourceType != null &&
+                                      message.embeddedResourceType == 'image'
+                                      // message.fileData != null
+                              )
+                                    Container(
+                                      width: 200, // Adjust size as needed
+                                      height: 200, // Adjust size as needed
+                                      // child: Image.memory(
+                                      //   Uint8List.fromList(message.fileData!),
+                                      //   fit: BoxFit.cover,
+                                      // ),
+                                    )
+                                  else
+                                    Text(
+                                      message.text,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: AppColors.textColor,
+                                      ),
+                                    ),
+                                  if (message.isEdited)
+                                    const Text(
+                                      "Edited",
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.grey),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
                 ),
+              ),
             ),
-            ),// Input Box
-
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -407,7 +606,8 @@ class _ConversationPageState extends State<ConversationPage> {
                       style: const TextStyle(color: AppColors.textColor),
                       decoration: InputDecoration(
                         hintText: 'Type a message...',
-                        hintStyle: const TextStyle(color: AppColors.primaryColor),
+                        hintStyle: const TextStyle(
+                            color: AppColors.primaryColor),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
@@ -416,10 +616,16 @@ class _ConversationPageState extends State<ConversationPage> {
                   ),
                   const SizedBox(width: 8),
                   GestureDetector(
-                    onTap: () => _sendMessage(messagingService, authService), // Normal tap for sending a message
-                    onLongPress: () => _showScheduleMessageDialog(conversationsService, authService), // Long press to open the scheduler
+
+                    onTap: () => _sendMessage(messagingService, authService),
+                    // Normal tap for sending a message
+                    onLongPress: () =>
+                        _showScheduleMessageDialog(
+                            conversationsService, authService),
+                    // Long press to open the scheduler
                     child: ElevatedButton(
-                      onPressed: null, // Disabled because GestureDetector handles the click
+                      onPressed: null,
+                      // Disabled because GestureDetector handles the click
                       style: ElevatedButton.styleFrom(
                         shape: const CircleBorder(),
                         padding: const EdgeInsets.all(12),
@@ -429,6 +635,19 @@ class _ConversationPageState extends State<ConversationPage> {
                         _editedMessage != null ? Icons.edit : Icons.send,
                         color: AppColors.textColor,
                       ),
+                    ),
+                  ),
+                  const SizedBox(width: 8), // Long press to open the scheduler
+                  ElevatedButton(
+                    onPressed: () => _showModal(context),
+                    style: ElevatedButton.styleFrom(
+                      shape: const CircleBorder(),
+                      padding: const EdgeInsets.all(12),
+                      backgroundColor: AppColors.accentColor
+                    ),
+                    child: Icon(
+                       Icons.attach_file,
+                      color: AppColors.textColor,
                     ),
                   ),
                 ],

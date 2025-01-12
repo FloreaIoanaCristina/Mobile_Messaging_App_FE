@@ -7,6 +7,12 @@ class Message {
   final String conversationId;
   final String? embeddedResourceType;
   final bool isScheduled;
+  // final String? fileType;
+  // final List<int>? fileData;
+  // final double? userLatitude;
+  // final double? userLongitude;
+  // final double? destinationLatitude;
+  // final double? destinationLongitude;
 
   Message({
     required this.sentTime,
@@ -16,6 +22,12 @@ class Message {
     required this.conversationId,
     this.embeddedResourceType,
     required this.isScheduled,
+    // this.fileType,
+    // this.fileData,
+    // this.userLatitude,
+    // this.userLongitude,
+    // this.destinationLatitude,
+    // this.destinationLongitude
   });
   // Convert to JSON for sending to backend
   Map<String, dynamic> toJson() {
@@ -25,14 +37,24 @@ class Message {
       'text': text,
       'senderId': senderId,
       'conversationId': conversationId,
-      'embeddedResourceType': embeddedResourceType,
+      'embeddedResourceType':embeddedResourceType,
       'isScheduled': isScheduled,
-      'messageId': messageId ?? "00000000-0000-0000-0000-000000000000"
+      // 'fileType': fileType,
+      // 'fileData': fileData,
+      // 'userLatitude': userLatitude,
+      // 'userLongitude':userLongitude,
+      // 'destinationLatitude': destinationLatitude,
+      // 'destinationLongitude': destinationLongitude,
+      'messageId': messageId ?? "00000000-0000-0000-0000-000000000000",
+
+
     };
   }
   Message.name(this.messageId, this.sentTime, this.isEdited, this.text,
-      this.senderId, this.conversationId, this.embeddedResourceType,
-      this.isScheduled);
+      this.senderId, this.conversationId,this.embeddedResourceType, this.isScheduled,
+      // this.fileType,this.fileData, this.userLatitude,
+      // this.userLongitude, this.destinationLatitude, this.destinationLongitude
+  );
 
 factory Message.fromJson(Map<String, dynamic> json) {
     return Message.name(
@@ -42,8 +64,14 @@ factory Message.fromJson(Map<String, dynamic> json) {
       json['text'],
       json['senderId'],
       json['conversationId'] ,
-      json['embeddedResourceType'],
-      json['isScheduled'],
+      // json['fileType'],
+      // json['fileData'],
+      // json['userLatitude'],
+      // json['userLongitude'],
+      // json['destinationLatitude'],
+      // json['destinationLongitude'],
+      json['embededResourceType'],
+      json['isScheduled']
     );
   }
 

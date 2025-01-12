@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:messaging_mobile_app/conversation_page.dart';
 import 'package:messaging_mobile_app/repos/accounts_repo.dart';
 import 'package:messaging_mobile_app/repos/conversations_repo.dart';
 import 'package:messaging_mobile_app/services/messaging_service.dart';
 import 'package:messaging_mobile_app/style/colors.dart';
 import 'package:provider/provider.dart';
 import 'log_in_page.dart';
-import 'sign_up_page.dart';
 
 Future<void> main() async{
   await dotenv.load(fileName: ".env"); // Load .env file

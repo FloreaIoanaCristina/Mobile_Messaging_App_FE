@@ -20,7 +20,7 @@ class MessagingService with ChangeNotifier {
         Map<String, dynamic> decodedClaims = JwtDecoder.decode(key);
         String? userId = decodedClaims['Id'];
         if(userId!=null) {
-          final url = 'http://192.168.1.104:5106/ChatHub'; // Your SignalR Hub URL
+          final url = 'http://192.168.1.106:5106/ChatHub'; // Your SignalR Hub URL
           _hubConnection = HubConnectionBuilder().withUrl(url).build();
           _hubConnection.on('ReceiveMessage', _onReceiveMessage);
           await _hubConnection.start();
@@ -98,7 +98,7 @@ class MessagingService with ChangeNotifier {
       notifyListeners(); // Notify UI about the update
 
       // Send the message object as JSON to the backend
-      await _hubConnection.invoke('SendMessage', args: [message.toJson(), fileData, fileType]);
+      await _hubConnection.invoke('SendMessage', args: [message.toJson(),fileData, fileType]);
       print("Message sent: ${message.toJson()}");
     } catch (e) {
       print("Error sending message: $e");

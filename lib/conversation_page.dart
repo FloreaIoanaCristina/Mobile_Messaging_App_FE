@@ -13,7 +13,9 @@ import 'package:messaging_mobile_app/style/colors.dart';
 import 'package:provider/provider.dart';
 
 import 'contacts_page.dart';
+import 'maps_page.dart';
 import 'media_display_modal.dart';
+import 'media_page.dart';
 import 'models/message.dart';
 
 class ConversationPage extends StatefulWidget {
@@ -85,9 +87,9 @@ class _ConversationPageState extends State<ConversationPage> {
 
   @override
   void dispose() {
-    final messagingService = Provider.of<MessagingService>(
-        context, listen: false);
-    messagingService.stopConnection();
+    // final messagingService = Provider.of<MessagingService>(
+    //     context, listen: false);
+    // messagingService.stopConnection();
     super.dispose();
   }
 
@@ -323,22 +325,22 @@ class _ConversationPageState extends State<ConversationPage> {
       ),
       builder: (BuildContext context) {
         return MediaDisplayModal(
-          onCameraTap: () => _getPhotoFromCamera(context),
-          onGalleryTap: () => _getPhotoFromGallery(context),
+          onCameraTap: () => _getPhotoFromCamera(),
+          onGalleryTap: () => _getPhotoFromGallery(),
           onDocumentTap: () => _getDocument(context),
-          onLocationTap: () => _getLiveLocation(context),
+          onLocationTap: () => _getLiveLocation(),
         );
       },
     );
   }
 
-  Future<void> _getLiveLocation(BuildContext context) async {
+  Future<void> _getLiveLocation() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Location services are disabled."),
-        ));
+        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        //   content: Text("Location services are disabled."),
+        // ));
         return;
       }
 
@@ -362,10 +364,16 @@ class _ConversationPageState extends State<ConversationPage> {
 
       Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
-
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Location: ${position.latitude}, ${position.longitude}"),
-      ));
+      // if (mounted) {
+      //   // Show a SnackBar safely
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(content: Text("Location updated: ${position.latitude}, ${position.longitude}")),
+      //   );
+      // }
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => MapsPage() ),
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Failed to get location: $e"),
@@ -373,7 +381,7 @@ class _ConversationPageState extends State<ConversationPage> {
     }
   }
 
-  Future<void> _getPhotoFromCamera(BuildContext context) async {
+  Future<void> _getPhotoFromCamera() async {
     final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
     if (photo != null) {
       Navigator.pop(context);
@@ -383,7 +391,7 @@ class _ConversationPageState extends State<ConversationPage> {
       final List<int> fileData = await file.readAsBytes();
 
       // Send the image message
-      await _sendImageMessage(context, fileData, 'image/jpeg');
+      await _sendImageMessage(fileData, 'image/jpeg');
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Camera image selected: ${photo.name}"),
@@ -391,18 +399,25 @@ class _ConversationPageState extends State<ConversationPage> {
     }
   }
 
-  Future<void> _getPhotoFromGallery(BuildContext context) async {
+  Future<void> _getPhotoFromGallery() async {
+    // Pick the image from the gallery
     final XFile? photo = await _picker.pickImage(source: ImageSource.gallery);
+
     if (photo != null) {
-      Navigator.pop(context);
+      // Ensure widget is still mounted before accessing context
+      if (!mounted) return;
 
-      // Read the image file as bytes
+      final messagingService = Provider.of<MessagingService>(
+          context, listen: false);
+      await messagingService.startConnection();
+
       final file = File(photo.path);
-      final List<int> fileData = await file.readAsBytes();
+      final Uint8List fileData = await file.readAsBytes();
 
-      // Send the image message
-      await _sendImageMessage(context, fileData, 'image/jpeg');
+      // Send the image message safely
+      await _sendImageMessage(fileData, 'image');
 
+      // Show a snack bar to notify the user
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Gallery image selected: ${photo.name}"),
       ));
@@ -410,10 +425,10 @@ class _ConversationPageState extends State<ConversationPage> {
   }
 
 // Send image message
-  Future<void> _sendImageMessage(BuildContext context, List<int> fileData, String fileType) async {
+  Future<void> _sendImageMessage(List<int> fileData, String fileType) async {
     String conversationId = widget.conversationId;
     final authService = Provider.of<AuthService>(context, listen: false);
-    String? userId = await authService.getIdFromClaims();// Replace with actual conversation ID
+   // String? userId = await authService.getIdFromClaims();// Replace with actual conversation ID
     final messagingService = Provider.of<MessagingService>(
         context, listen: false);
     // Send message with the image file
@@ -493,7 +508,12 @@ class _ConversationPageState extends State<ConversationPage> {
                     ],
                   ),
                   const Spacer(),
-                  const Icon(Icons.more_vert, color: AppColors.accentColor),
+                  IconButton(
+                      icon: const Icon(Icons.more_vert, color: AppColors.accentColor),
+                       onPressed: () =>
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => MediaPage(contactName: _conversationName??"", mediaFiles: [],)))
+
+                    )
                 ],
               ),
             ),

@@ -4,7 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class RoutingService {
   final String _baseUrl = "https://maps.googleapis.com/maps/api/directions/json";
-  final String _apiKey = "AIzaSyBXMezeUjc_jPWYvX7PqtwR6fP82aRkrZQ";
+  final String _apiKey = "";
 
   Future<List<LatLng>> getRoutePoints(LatLng origin, LatLng destination) async {
     final String url =

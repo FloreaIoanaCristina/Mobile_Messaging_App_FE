@@ -5,11 +5,12 @@ import 'package:messaging_mobile_app/repos/conversations_repo.dart';
 import 'package:messaging_mobile_app/services/messaging_service.dart';
 import 'package:messaging_mobile_app/style/colors.dart';
 import 'package:provider/provider.dart';
+import 'configurations/api_config.dart';
 import 'log_in_page.dart';
 
 Future<void> main() async{
   await dotenv.load(fileName: ".env"); // Load .env file
-  final baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://default_base_url';
+  final baseUrl = ApiConfig.baseUrl;
   if (baseUrl == 'http://default_base_url') {
     print('API_BASE_URL is missing from the .env file!');
   }

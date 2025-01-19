@@ -12,7 +12,7 @@ class AuthService {
 
   // Register a new user
   Future<AuthenticationResponse> registerUser(String username,String phoneNumber, String password) async {
-    final url = Uri.parse('$baseUrl/accounts/create');
+    final url = Uri.parse('$baseUrl/api/accounts/create');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
@@ -37,7 +37,7 @@ class AuthService {
 
   // Login method
   Future<AuthenticationResponse> loginUser(String username, String password) async {
-    final url = Uri.parse('$baseUrl/accounts/login');
+    final url = Uri.parse('$baseUrl/api/accounts/login');
 
     final response = await http.post(
       url,

@@ -1,9 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:signalr_core/signalr_core.dart';
 
 import '../models/message.dart';
+
+import 'dart:typed_data';
+
+import '../repos/helpers/document_media.dart'; // For Uint8List
 
 class MessagingService with ChangeNotifier {
   final _secureStorage = const FlutterSecureStorage();
@@ -16,13 +22,20 @@ class MessagingService with ChangeNotifier {
   Future<void> startConnection() async {
     try {
       String? key = await _secureStorage.read(key: 'jwt');
-      if(key!=null) {
+      if (key != null) {
         Map<String, dynamic> decodedClaims = JwtDecoder.decode(key);
         String? userId = decodedClaims['Id'];
-        if(userId!=null) {
-          final url = 'http://192.168.1.106:5106/ChatHub'; // Your SignalR Hub URL
+        if (userId != null) {
+          final url = 'http://192.168.0.167:5106/ChatHub'; // Your SignalR Hub URL
           _hubConnection = HubConnectionBuilder().withUrl(url).build();
           _hubConnection.on('ReceiveMessage', _onReceiveMessage);
+          _hubConnection.on('ReceiveMediaMessage', (args) {
+            try {
+              _onReceiveMediaMessage(args);
+            } catch (e) {
+              print("Error in event handler: $e");
+            }
+          });// New listener for file metadata
           await _hubConnection.start();
           _hubConnection.invoke('joinHub', args: [userId]);
 
@@ -33,8 +46,10 @@ class MessagingService with ChangeNotifier {
       print("Error starting SignalR connection: $e");
     }
   }
-
-
+  Future<void> sendMediaMessage(String messageId, String conversationId) async {
+    print("Connection state: ${_hubConnection.state}");
+    await _hubConnection.invoke("SendMediaMessage", args: [messageId, conversationId]);
+  }
 
   // Send message to the hub
   Future<void> sendMessage({
@@ -46,62 +61,59 @@ class MessagingService with ChangeNotifier {
     String? messageId,
     bool isEdited = false,
     DateTime? sentTime,
-    String? fileType,
-    List<int>? fileData,
-    double? userLatitude,
-    double? userLongitude,
-    double? destinationLatitude,
-    double? destinationLongitude
+    List<Document>? documents,
   }) async {
     try {
       Message message;
-      if (messageId ==null)
-      // Create a Message object
-          {
+      if (messageId == null) {
+        // Create a Message object
         message = Message(
-            sentTime: DateTime.now().toUtc(),
-            isEdited: isEdited,
-            text: text,
-            senderId: senderId,
-            conversationId: conversationId,
-            isScheduled: isScheduled,
-            // userLatitude: userLatitude,
-            // userLongitude: userLongitude,
-            // destinationLatitude: destinationLatitude,
-            // destinationLongitude: destinationLongitude
+          sentTime: DateTime.now().toUtc(),
+          isEdited: isEdited,
+          text: text,
+          senderId: senderId,
+          conversationId: conversationId,
+          isScheduled: isScheduled,
+          documents: documents ?? [],
+        );
+      } else {
+        message = Message.name(
+          messageId,
+          sentTime ?? DateTime.now().toUtc(),
+          isEdited,
+          text,
+          senderId,
+          conversationId,
+          embeddedResourceType,
+          isScheduled,
+          documents ?? [], // Include documents if available
         );
       }
-      else
-        {
-          message = Message.name(
-               messageId,
-               sentTime ?? DateTime.now().toUtc(),
-               isEdited,
-               text,
-               senderId,
-               conversationId,
-               embeddedResourceType,
-               isScheduled,
-            //   fileType,
-            //   fileData,
-            // userLatitude,
-            // userLongitude,
-            // destinationLatitude,
-            // destinationLongitude
-
-          );
-        }
 
       // Update the local list immediately
-      if(!isEdited)
-        _messages.insert(0, message); // Add to the beginning for reverse ListView
+      if (!isEdited) _messages.insert(0, message); // Add to the beginning for reverse ListView
       notifyListeners(); // Notify UI about the update
 
-      // Send the message object as JSON to the backend
-      await _hubConnection.invoke('SendMessage', args: [message.toJson(),fileData, fileType]);
+      // Serialize the message object and include the documents list
+      final messageJson = message.toJson();
+      await _hubConnection.invoke('SendMessage', args: [messageJson]);
+
       print("Message sent: ${message.toJson()}");
     } catch (e) {
       print("Error sending message: $e");
+    }
+  }
+
+  // Receive file metadata from the server
+  void _onReceiveMediaMessage(List<Object?>? args) {
+    try {
+    final messageJson = args?[0] as Map<String, dynamic>;
+    final message = Message.fromJson(messageJson);
+    print("New message from ${message.senderId}: ${message.text}");
+    _messages.insert(0, message);
+    notifyListeners();
+    } catch (e) {
+      print("Error receiving or parsing message: $e");
     }
   }
 
@@ -129,5 +141,26 @@ class MessagingService with ChangeNotifier {
   Future<void> stopConnection() async {
     await _hubConnection.stop();
     print("Disconnected from SignalR Hub");
+  }
+
+  List<DocumentMedia> getMediaMessages() {
+    List<DocumentMedia> mediaFiles = [];
+
+    for (Message message in _messages) {
+      if (message.embeddedResourceType == 'image' ||
+          message.embeddedResourceType == 'document') {
+        if (message.documents.isNotEmpty && message.documents.first != null) {
+          // Create a DocumentMedia instance
+          DocumentMedia documentMedia = DocumentMedia(
+            document: message.documents.first,  // Assuming documents is a list
+            embeddedResourceType: message.embeddedResourceType ?? "",
+            text: message.text,  // Assuming there's text in the message
+          );
+          mediaFiles.add(documentMedia);
+        }
+      }
+    }
+
+    return mediaFiles;
   }
 }

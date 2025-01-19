@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 import '../models/message.dart';
 
@@ -11,7 +13,7 @@ class ConversationsService {
   Future<List<dynamic>> getMessages(String conversationId, int startIndex,
       int count, String jwtToken) async {
     final url = Uri.parse(
-        '$baseUrl/$conversationId/GetMessages?startIndex=$startIndex&count=$count');
+        '$baseUrl/api/$conversationId/GetMessages?startIndex=$startIndex&count=$count');
 
     final response = await http.get(
       url,
@@ -30,7 +32,7 @@ class ConversationsService {
   }
 
   Future<Map<String, dynamic>> createConversation(String userId1, String userId2,) async {
-    final url = Uri.parse('$baseUrl/conversations/createConversation');
+    final url = Uri.parse('$baseUrl/api/conversations/createConversation');
 
     final response = await http.post(
       url,
@@ -67,7 +69,7 @@ class ConversationsService {
 
   Future<Map<String, dynamic>> getConversationById(String conversationId, String userId) async {
     final url = Uri.parse(
-        '$baseUrl/conversations/$conversationId/$userId/getConversationById');
+        '$baseUrl/api/conversations/$conversationId/$userId/getConversationById');
 
     final response = await http.get(
       url,
@@ -90,7 +92,7 @@ class ConversationsService {
 
   Future<List<dynamic>> getConversationsForUser(userId) async {
     final url = Uri.parse(
-        '$baseUrl/conversations/user/$userId/getConversationsForUser');
+        '$baseUrl/api/conversations/user/$userId/getConversationsForUser');
 
     final response = await http.get(
       url,
@@ -113,7 +115,7 @@ class ConversationsService {
 
 
     final url = Uri.parse(
-        '$baseUrl/conversations/users/search?query=$query');
+        '$baseUrl/api/conversations/users/search?query=$query');
 
     final response = await http.get(
       url,
@@ -133,7 +135,7 @@ class ConversationsService {
   }
 
   Future<Map<String, dynamic>> getUserProfile(String jwtToken) async {
-    final url = Uri.parse('$baseUrl/conversations/user/profile');
+    final url = Uri.parse('$baseUrl/api/conversations/user/profile');
 
     final response = await http.get(
       url,
@@ -157,7 +159,7 @@ class ConversationsService {
     required String conversationId,
     required DateTime scheduledDateTime,
   }) async {
-    final url = Uri.parse("$baseUrl/conversations/scheduledMessages"); // Endpoint for scheduling messages
+    final url = Uri.parse("$baseUrl/api/conversations/scheduledMessages"); // Endpoint for scheduling messages
 
     final body = jsonEncode({
       "message": {
@@ -181,6 +183,54 @@ class ConversationsService {
       print("Message scheduled successfully for $scheduledDateTime!");
     } else {
       throw Exception("Failed to schedule message: ${response.body}");
+    }
+  }
+
+  Future<Map<String, dynamic>> uploadMessageWithFile(
+      String fileData,
+      String fileName,
+      String fileType,
+      Message message,
+      ) async {
+    final url = Uri.parse('$baseUrl/api/File/upload');
+
+    // Prepare the document as a Base64-encoded string
+    final document = Document(
+      // Placeholder ID
+      fileName: fileName,
+      documentType: fileType,
+      document1: fileData,
+    );
+
+    // Attach the document to the message
+    final messageWithDocument = Message(
+      sentTime: message.sentTime,
+      isEdited: message.isEdited,
+      text: message.text,
+      senderId: message.senderId,
+      conversationId: message.conversationId,
+      embeddedResourceType: message.embeddedResourceType,
+      isScheduled: message.isScheduled,
+      documents: [document], // Include the document
+    );
+
+    // Convert the message to JSON
+    final messageJson = jsonEncode(messageWithDocument.toJson());
+
+    // Create the HTTP POST request
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json', // Indicate JSON content
+      },
+      body: messageJson, // Send the message JSON
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      return responseData;
+    } else {
+      throw Exception('Failed to upload message with file: ${response.reasonPhrase}');
     }
   }
 }
